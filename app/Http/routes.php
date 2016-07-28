@@ -17,6 +17,7 @@ Route::get('/', function () {
 
 Route::group(['middleware' => 'auth'], function() {
     Route::get('/dashboard', 'DashboardController@index');
+    Route::get('/slack/auth', 'SlackController@auth');
 });
 
 Route::controllers([

@@ -35,6 +35,7 @@ class ApiController extends Controller
                     $result = $this->sendTelegram($app, $event->event, $event->data);
                     break;
                 case 'slack':
+                    $result = $this->sendSlack($app, $event->event, $event->data);
                     break;
                 default:
                     return response()->json(['error' => 'Invalid platform'], 404);
@@ -64,6 +65,36 @@ class ApiController extends Controller
 
         $token = getenv('TELEGRAM_TOKEN');
         return $this->send("https://api.telegram.org/bot$token/sendMessage", $params);
+    }
+
+    private function sendSlack($app, $event, $data) {
+        $text = '📌 *Event*: '.$event;
+        // $text .= '📎 *Data*: '.PHP_EOL;
+        $attachment = [
+            'fallback' => $text,
+            'fields' => []
+        ];
+        foreach($data as $k=>$v) {
+            $attachment['fields'][] = ['title' => $k, 'value' => $v, 'short' => true];
+        }
+
+        $params = [
+            'token' => $app->data['bot']['bot_access_token'],
+            'channel' => $app->data['incoming_webhook']['channel_id'],
+            'text' => $text,
+            'attachments' => json_encode([$attachment])
+        ];
+
+        // if(array_key_exists('name', $data)) {
+        //     $params['as_user'] = false;
+        //     $params['username'] = $data['name'];
+        // }
+        // if(array_key_exists('profile_pic', $data)) {
+        //     $params['as_user'] = false;
+        //     $params['icon_url'] = $data['profile_pic'];
+        // }
+
+        return $this->send("https://slack.com/api/chat.postMessage", $params);
     }
 
     private function send($url, $params) {
