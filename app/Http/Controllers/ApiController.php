@@ -41,7 +41,7 @@ class ApiController extends Controller
             }
         } else {
             $result = [
-                'response' => ['event' => $event->id],
+                'response' => $event,
                 'status' => 201
             ];
         }
@@ -63,8 +63,12 @@ class ApiController extends Controller
         ];
 
         $token = getenv('TELEGRAM_TOKEN');
+        return $this->send("https://api.telegram.org/bot$token/sendMessage", $params);
+    }
+
+    private function send($url, $params) {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://api.telegram.org/bot$token/sendMessage");
+        curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
