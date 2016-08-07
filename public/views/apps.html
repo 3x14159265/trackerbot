@@ -1,0 +1,48 @@
+<div class="row">
+    <div class="page-header">
+        <h2 class="uppercase">Apps</h2>
+
+        <div ng-if="loading">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <i class="fa fa-refresh fa-spin fa-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="!loading">
+            <div class="container">
+                <div class="row text-center">
+                    <div class="col-lg-3 col-md-4 col-xs-5 integration" ng-repeat="app in apps">
+                        <h3 class="uppercase">
+                            {{ app.name }}
+                        </h3>
+                        <p>
+                            <strong>API Key:</strong>
+                            {{ app.api_key }}</p>
+                        <p>
+                            <strong>API Secret:</strong>
+                            <button class="btn btn-default" ng-click="show=!show" ng-show="!show">Show</button>
+                            <span ng-show="show">{{ app.api_secret }}</span>
+                        </p>
+                        <p>
+                            <a class="btn btn-primary uppercase" ng-href="#/integrations/{{ app.id }}">
+                                Select app
+                            </a>
+                        </p>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-5 integration">
+                        <h3>
+                            <i class="fa fa-plus fa-lg"></i>
+                        </h3>
+                        <p>
+                            <button class="btn btn-primary uppercase" ng-click="createApp()">Create a new app</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

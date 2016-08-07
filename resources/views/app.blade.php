@@ -1,17 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="tracker">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>@section('title') TrackerBot @show</title>
+    <title>@section('title') @show</title>
     @show @section('meta_description')
         <meta name="description"
               content=""/>
     @show
 
-		<link href="{{ asset('/bower_components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,300" rel="stylesheet" type="text/css">
+	<link href="{{ asset('/bower_components/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('/bower_components/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('/bower_components/sweetalert/dist/sweetalert.css') }}" rel="stylesheet">
+
 
     @yield('styles')
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -34,6 +39,8 @@
 <!-- Scripts -->
 <script src="{{ asset('/bower_components/jquery/dist/jquery.min.js') }}"></script>
 <script src="{{ asset('/bower_components/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('/js/trackerbot.js') }}"></script>
+<script>window.TrackerBot = new TrackerBot('CYXLF4SRHJ6J', true)</script>
 
 @yield('scripts')
 

@@ -16,6 +16,7 @@ class VerifyCsrfToken extends BaseVerifier
 
     protected $except = [
         '/telegram/webhook/*',
-        '/api'
+        '/api',
+        '/track'
     ];
 }

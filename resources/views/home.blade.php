@@ -1,5 +1,5 @@
 @extends('app')
-@section('title') Home :: @parent @endsection
+@section('title') TRACKERBOT - track events directly into your Slack or Telegram @endsection
 @section('content')
 <div class="row">
     <div class="page-header">

@@ -6,12 +6,14 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Requests\ApiRequest;
+use App\Http\Requests\JsRequest;
+use App\Chat;
 use App\Event;
 use App\App;
 
 class ApiController extends Controller
 {
-    public function post(ApiRequest $request) {
+    public function api(ApiRequest $request) {
         $header = $request->header('Authorization');
         $auth = base64_decode(trim(str_replace('Basic', '', $header)));
         $auth = explode(':', $auth);
@@ -19,9 +21,28 @@ class ApiController extends Controller
         $secret = $auth[1];
 
         $data = $request->all();
-
         $app = App::findByKeyAndSecret($key, $secret);
+        $result = $this->storeEvent($app, $data);
 
+        return response()->json('', 201);
+    }
+
+    public function track(JsRequest $request) {
+        $data = $request->all();
+        $app = App::findByKey($data['api_key']);
+        unset($data['api_key']);
+
+        $result = $this->storeEvent($app, $data);
+
+        return response()->json([$result['response']], $result['status'])
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Credentials', 'true')
+            ->header('Access-Control-Allow-Methods', 'POST')
+            ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, Accept, Authorization')
+            ->header('Access-Control-Max-Age', '3600');
+    }
+
+    private function storeEvent($app, $data) {
         $event = new Event();
         $event->app_id = $app->id;
         $event->type = $data['type'];
@@ -30,15 +51,18 @@ class ApiController extends Controller
         $event->save();
 
         if($event->type == 'rt_event') {
-            switch($app->platform) {
-                case 'telegram':
-                    $result = $this->sendTelegram($app, $event->event, $event->data);
-                    break;
-                case 'slack':
-                    $result = $this->sendSlack($app, $event->event, $event->data);
-                    break;
-                default:
-                    return response()->json(['error' => 'Invalid platform'], 404);
+            $chats = Chat::findByApp($app);
+            foreach($chats as $chat) {
+                switch($chat->platform) {
+                    case 'telegram':
+                        $result = $this->sendTelegram($app, $chat, $event->event, $event->data);
+                        break;
+                    case 'slack':
+                        $result = $this->sendSlack($app, $chat, $event->event, $event->data);
+                        break;
+                    default:
+                        return response()->json(['error' => 'Invalid platform'], 404);
+                }
             }
         } else {
             $result = [
@@ -47,18 +71,21 @@ class ApiController extends Controller
             ];
         }
 
-        return response()->json([$result['response']], $result['status']);
+        return $result;
     }
 
-    private function sendTelegram($app, $event, $data) {
-        $text = '📌 *Event*: '.$event.PHP_EOL.PHP_EOL;
-        $text .= '📎 *Data*: '.PHP_EOL;
-        foreach($data as $k=>$v) {
-            $text .= "🔹 $k: $v".PHP_EOL;
+    private function sendTelegram($app, $chat, $event, $data) {
+        $text = '🌐 *App*: '.$app->name.PHP_EOL;
+        $text .= '📌 *Event*: '.$event.PHP_EOL.PHP_EOL;
+        if($data) {
+            $text .= '📎 *Data*: '.PHP_EOL;
+            foreach($data as $k=>$v) {
+                $text .= "🔹 $k: $v".PHP_EOL;
+            }
         }
 
         $params = [
-            'chat_id' => $app->data['chat_id'],
+            'chat_id' => $chat->identifier,
             'text' => $text,
             'parse_mode' => 'Markdown'
         ];
@@ -67,32 +94,28 @@ class ApiController extends Controller
         return $this->send("https://api.telegram.org/bot$token/sendMessage", $params);
     }
 
-    private function sendSlack($app, $event, $data) {
-        $text = '📌 *Event*: '.$event;
-        // $text .= '📎 *Data*: '.PHP_EOL;
-        $attachment = [
-            'fallback' => $text,
-            'fields' => []
-        ];
-        foreach($data as $k=>$v) {
-            $attachment['fields'][] = ['title' => $k, 'value' => $v, 'short' => true];
+    private function sendSlack($app, $chat, $event, $data) {
+        $text = '🌐 *App*: '.$app->name.PHP_EOL;
+        $text .= '📌 *Event*: '.$event;
+        if($data) {
+            $attachment = [
+                'fallback' => $text,
+                'fields' => []
+            ];
+            foreach($data as $k=>$v) {
+                $attachment['fields'][] = ['title' => $k, 'value' => $v, 'short' => true];
+            }
         }
 
         $params = [
-            'token' => $app->data['bot']['bot_access_token'],
-            'channel' => $app->data['incoming_webhook']['channel_id'],
-            'text' => $text,
-            'attachments' => json_encode([$attachment])
+            'token' => $chat->data['bot']['bot_access_token'],
+            'channel' => $chat->data['incoming_webhook']['channel_id'],
+            'text' => $text
         ];
 
-        // if(array_key_exists('name', $data)) {
-        //     $params['as_user'] = false;
-        //     $params['username'] = $data['name'];
-        // }
-        // if(array_key_exists('profile_pic', $data)) {
-        //     $params['as_user'] = false;
-        //     $params['icon_url'] = $data['profile_pic'];
-        // }
+        if($data) {
+            $params['attachments'] = json_encode([$attachment]);
+        }
 
         return $this->send("https://slack.com/api/chat.postMessage", $params);
     }

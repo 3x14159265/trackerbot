@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default navbar-inverse">
+<nav class="navbar navbar-default">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
@@ -15,31 +15,22 @@
             <ul class="nav navbar-nav">
                 @if(!Auth::guest())
                     <li class="{{ (Request::is('/dashboard') ? 'active' : '') }}">
-                        <a href="{{ url('/dashboard') }}"><i class="fa fa-home"></i> Dashboard</a>
+                        <a href="{{ url('/dashboard') }}">Dashboard</a>
                     </li>
                 @endif
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
                 @if (Auth::guest())
-                    <li class="{{ (Request::is('auth/login') ? 'active' : '') }}"><a href="{{ url('auth/login') }}"><i
-                                    class="fa fa-sign-in"></i> Login</a></li>
+                    <li class="{{ (Request::is('auth/login') ? 'active' : '') }}"><a href="{{ url('auth/login') }}"> Login</a></li>
                     <li class="{{ (Request::is('auth/register') ? 'active' : '') }}"><a
                                 href="{{ url('auth/register') }}">Register</a></li>
                 @else
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                           aria-expanded="false"><i class="fa fa-user"></i> {{ Auth::user()->name }} <i
+                        <a class="dropdown-toggle" data-toggle="dropdown" role="button"
+                           aria-expanded="false"> {{ Auth::user()->name }} <i
                                     class="fa fa-caret-down"></i></a>
                         <ul class="dropdown-menu" role="menu">
-                            @if(Auth::check())
-                                @if(Auth::user()->admin==1)
-                                    <li>
-                                        <a href="{{ url('admin/dashboard') }}"><i class="fa fa-tachometer"></i> Admin Dashboard</a>
-                                    </li>
-                                @endif
-                                <li role="presentation" class="divider"></li>
-                            @endif
                             <li>
                                 <a href="{{ url('auth/logout') }}"><i class="fa fa-sign-out"></i> Logout</a>
                             </li>
