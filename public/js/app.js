@@ -21,29 +21,17 @@ config([
     }
 ]).run(function($rootScope, $location) {
     // register listener to watch route changes
-    $rootScope.$on("$routeChangeStart", function(event, next, current) {
-    });
- }).controller('AppsCtrl', function($scope, $http) {
+    $rootScope.$on("$routeChangeStart", function(event, next, current) {});
+}).controller('AppsCtrl', function($scope, $http) {
 
     init()
 
     function init() {
-        $scope.createApp = createApp
         $scope.app = new Object()
-
         load()
     }
 
-    function load() {
-        $scope.loading = true
-        $http.get('/apps/all').then(function(res) {
-            $scope.apps = res.data
-        }).finally(function() {
-            $scope.loading = false
-        })
-    }
-
-    function createApp() {
+    $scope.createApp = function() {
         swal({
             title: "Create a new app",
             text: 'Please enter a name for the new app.',
@@ -61,12 +49,22 @@ config([
         });
     }
 
+    function load() {
+        $scope.loading = true
+        $http.get('/apps/all').then(function(res) {
+            $scope.apps = res.data
+        }).finally(function() {
+            $scope.loading = false
+        })
+    }
+
     function postApp(name) {
         $scope.loading = true
-        $http.post('/app', {name: name})
+        $http.post('/app', {
+                name: name
+            })
             .then(function(res) {
-                if(res.data && res.data.length) {
-                    $scope.apps = $scope.apps.concat(res.data)
+                if (res.data && res.data.length) {
                     TrackerBot.track('event', 'app_create')
                 }
                 $scope.app = new Object()
@@ -75,7 +73,7 @@ config([
                 swal("Oops...", "Something went wrong!", "error");
             })
             .finally(function() {
-                $scope.loading = false
+                load()
             })
     }
 }).controller('IntegrationsCtrl', function($scope, $http, $routeParams) {
@@ -90,7 +88,7 @@ config([
 
     function load(app_id) {
         $scope.loading = true
-        $http.get('/integrations/'+app_id).then(function(res) {
+        $http.get('/integrations/' + app_id).then(function(res) {
             $scope.app = res.data
         }).catch(function() {
             swal("Oops...", "Something went wrong!", "error")
@@ -127,9 +125,11 @@ config([
                 chat_id: chatId
             })
             .then(function(res) {
-                if(res.data && res.data.length) {
+                if (res.data && res.data.length) {
                     $scope.app.chats = $scope.app.chats.concat(res.data)
-                    TrackerBot.track('event', 'chat_connect', {platform: 'telegram'})
+                    TrackerBot.track('event', 'chat_connect', {
+                        platform: 'telegram'
+                    })
                 }
             })
             .catch(function() {

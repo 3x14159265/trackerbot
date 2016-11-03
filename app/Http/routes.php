@@ -12,22 +12,17 @@
 */
 
 Route::get('/', function () {
-    return view('home');
+    return view('welcome');
 });
 
-Route::group(['middleware' => 'auth'], function() {
+// Route::group(['middleware' => 'auth'], function() {
     Route::get('/dashboard', 'DashboardController@index');
     Route::get('/slack/auth', 'SlackController@auth');
     Route::get('/apps/all', 'DashboardController@apps');
     Route::get('/integrations/{appId}', 'DashboardController@integrations');
     Route::post('/app', 'DashboardController@createApp');
     Route::post('/telegram/connect', 'TelegramController@connect');
-});
-
-Route::controllers([
-    'auth' => 'Auth\AuthController',
-    'password' => 'Auth\PasswordController',
-]);
+// });
 
 Route::post('/api', 'ApiController@api');
 Route::post('/track', 'ApiController@track');
@@ -42,3 +37,7 @@ Route::options('/track', function() {
 });
 
 Route::post('/telegram/webhook/'.getenv('TELEGRAM_WEBHOOK_TOKEN'), 'TelegramController@webhook');
+
+Route::auth();
+
+Route::get('/dashboard', 'DashboardController@index');

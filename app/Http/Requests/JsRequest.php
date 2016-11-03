@@ -13,6 +13,7 @@ class JsRequest extends Request
      */
     public function authorize()
     {
+        $this->headers->add(['X-Api-Key' => $this->input('api_key')]);
         return true;
     }
 

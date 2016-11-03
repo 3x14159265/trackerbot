@@ -23,6 +23,9 @@ class ApiRequest extends Request
         $key = $auth[0];
         $secret = $auth[1];
 
+        $this->headers->add(['X-Api-Key' => $key]);
+        $this->headers->add(['X-Api-Secret' => $secret]);
+
         return App::where('api_key', '=', $key)
             ->where('api_secret', '=', $secret)
             ->exists();

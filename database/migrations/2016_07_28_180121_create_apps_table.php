@@ -14,15 +14,11 @@ class CreateAppsTable extends Migration
     {
         Schema::create('apps', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id')->unsigned();
+            $table->string('network');
             $table->string('name');
             $table->string('api_key');
             $table->string('api_secret');
             $table->timestamps();
-
-            $table->foreign('user_id')
-               ->references('id')->on('users')
-               ->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

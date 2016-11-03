@@ -5,8 +5,7 @@
         var self = this
         self.key = key
         var url = 'https://api.trackerbot.com/track'
-        if(dev)
-            url = 'https://tracker.ngrok.io/track'
+        if(dev) url = 'https://tracker.ngrok.io/track'
 
         self.track = function (type, event, params) {
             var xhttp = new XMLHttpRequest()

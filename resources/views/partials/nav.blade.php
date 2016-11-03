@@ -15,16 +15,16 @@
             <ul class="nav navbar-nav">
                 @if(!Auth::guest())
                     <li class="{{ (Request::is('/dashboard') ? 'active' : '') }}">
-                        <a href="{{ url('/dashboard') }}">Dashboard</a>
+                        <a href="/dashboard">Dashboard</a>
                     </li>
                 @endif
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
                 @if (Auth::guest())
-                    <li class="{{ (Request::is('auth/login') ? 'active' : '') }}"><a href="{{ url('auth/login') }}"> Login</a></li>
-                    <li class="{{ (Request::is('auth/register') ? 'active' : '') }}"><a
-                                href="{{ url('auth/register') }}">Register</a></li>
+                    <li class="{{ (Request::is('login') ? 'active' : '') }}"><a href="/login"> Login</a></li>
+                    <li class="{{ (Request::is('register') ? 'active' : '') }}"><a
+                                href="/register">Register</a></li>
                 @else
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" role="button"
@@ -32,7 +32,7 @@
                                     class="fa fa-caret-down"></i></a>
                         <ul class="dropdown-menu" role="menu">
                             <li>
-                                <a href="{{ url('auth/logout') }}"><i class="fa fa-sign-out"></i> Logout</a>
+                                <a href="/logout"><i class="fa fa-sign-out"></i> Logout</a>
                             </li>
                         </ul>
                     </li>
