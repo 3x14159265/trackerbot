@@ -12,11 +12,9 @@ class VerifyCsrfToken extends BaseVerifier
      * @var array
      */
 
-
-
     protected $except = [
         '/telegram/webhook/*',
-        '/api',
-        '/track'
+        '/api/*',
+        '/js/*'
     ];
 }

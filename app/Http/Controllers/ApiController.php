@@ -6,35 +6,33 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Requests\ApiRequest;
-use App\Http\Requests\JsRequest;
 use App\Chat;
 use App\Event;
 use App\App;
 use App\Networks\NetworkFactory;
+use App\APIProviders\Builtwith;
 
 class ApiController extends Controller
 {
-    public function api(ApiRequest $request) {
-        $data = $request->all();
+
+    public function track(ApiRequest $request) {
         $app = App::findByKeyAndSecret($request->header('X-Api-Key'), $request->header('X-Api-Secret'));
+        $data = $request->input('data');
         Event::store($app, $data);
 
         return response()->json(['status' => 'event_created'], 201);
     }
 
-    public function track(JsRequest $request) {
-        $app = App::findByKey($request->header('X-Api-Key'));
-        $data = $request->all();
-        unset($data['api_key']);
-        Event::store($app, $data);
+    public function domain(ApiRequest $request) {
+        $app = App::findByKeyAndSecret($request->header('X-Api-Key'), $request->header('X-Api-Secret'));
+        $data = $request->input('data');
+        $builtwith = new Builtwith();
+        $builtwith->sendInfo($app, $data['domain'], $data['filter']);
 
-        return response()->json(['status' => 'event_created'], 201)
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Credentials', 'true')
-            ->header('Access-Control-Allow-Methods', 'POST')
-            ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, Accept, Authorization')
-            ->header('Access-Control-Max-Age', '3600');
+        return response()->json(['status' => 'event_created'], 201);
     }
+
+
 
 
 }

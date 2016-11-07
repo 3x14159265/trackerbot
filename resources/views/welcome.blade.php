@@ -9,60 +9,15 @@
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,200,300" rel="stylesheet" type="text/css">
+        <link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+        <link href="/css/app.css" rel="stylesheet" type="text/css">
         {{-- <link rel="icon" type="image/png" href="/img/kronos.png"> --}}
 
         <!-- Styles -->
         <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Raleway', sans-serif;
-                font-weight: 100;
-                height: 100vh;
-                margin: 0;
-            }
 
-            .full-height {
-                height: 100vh;
-            }
-
-            .flex-center {
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
-
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
-
-            .content {
-                text-align: center;
-            }
-
-            .title {
-                font-size: 84px;
-            }
-
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 12px;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
-
-            .m-b-md {
-                margin-bottom: 30px;
-            }
         </style>
     </head>
     <body>
@@ -74,6 +29,18 @@
                 <div class="title m-b-md">
                     TrackerBot
                 </div>
+                <div class="title m-b-md">
+                    <a href="https://telegram.me/TrackerTestBot" class="btn btn-info btn-tg network">
+                        <i class="fa fa-paper-plane"></i>
+                        Add to
+                        <strong>Telegram</strong>
+                    </a>
+
+                    <a href="https://slack.com/oauth/authorize?scope=incoming-webhook,commands,bot&client_id=24628397702.64258146496&state=state" class="network">
+                        <img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x"/>
+                    </a>
+
+                </div>
             </div>
         </div>
 
@@ -82,6 +49,8 @@
         window.TrackerBot = new TrackerBot('tg_41478911', true);
         // TrackerBot.track('rt_event', 'eventname', {'some': 'data'})
         TrackerBot.track('rt_event', 'eventname', {'what': 'ever', 'some': {'more': 'data', 'and': {'even': 'more'}}})
+        TrackerBot.track('rt_error', 'eventname', {'what': 'ever', 'some': {'more': 'data', 'and': {'even': 'more'}}})
+        TrackerBot.domain('heycookie.co.za', ['woocommerce', 'shop'])
     </script>
     </body>
 </html>

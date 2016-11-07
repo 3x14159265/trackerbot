@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class App extends Model
 {
+
+    protected $casts = [
+        'urls' => 'array',
+    ];
+
     public function chats()
     {
         return $this->hasMany('App\Chat');

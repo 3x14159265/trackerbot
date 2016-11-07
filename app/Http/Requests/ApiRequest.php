@@ -20,8 +20,8 @@ class ApiRequest extends Request
         if(count($auth) != 2)
             return false;
 
-        $key = $auth[0];
-        $secret = $auth[1];
+        $key = trim($auth[0]);
+        $secret = trim($auth[1]);
 
         $this->headers->add(['X-Api-Key' => $key]);
         $this->headers->add(['X-Api-Secret' => $secret]);
@@ -39,9 +39,7 @@ class ApiRequest extends Request
     public function rules()
     {
         return [
-            'type' => 'string|required',
-            'event' => 'string|required',
-            'data' => 'array'
+            'data' => 'array|required'
         ];
     }
 }

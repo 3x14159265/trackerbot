@@ -13,7 +13,7 @@ class JsRequest extends Request
      */
     public function authorize()
     {
-        $this->headers->add(['X-Api-Key' => $this->input('api_key')]);
+        $this->headers->add(['X-Api-Key' => $this->route('api_key')]);
         return true;
     }
 
@@ -25,10 +25,7 @@ class JsRequest extends Request
     public function rules()
     {
         return [
-            'api_key' => 'string|required|exists:apps,api_key',
-            'type' => 'string|required',
-            'event' => 'string|required',
-            'data' => 'array'
+            'data' => 'required|array'
         ];
     }
 }

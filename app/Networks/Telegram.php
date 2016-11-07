@@ -30,7 +30,7 @@ class Telegram implements Network
         if(array_key_exists('title', $result)) {
             $name = $result['title'];
         } else if(array_key_exists('username', $result)) {
-            $name = $result['username'];
+            $name = '@'.$result['username'];
         } else if(array_key_exists('last_name', $result)) {
             $name = $result['last_name'];
         } else if(array_key_exists('first_name', $result)) {
@@ -48,30 +48,30 @@ class Telegram implements Network
         if(gettype($text) === 'array') {
             $formatted = '';
             foreach($text as $k=>$v) {
-                $formatted .= "*$k*: ".str_replace('_', '\_', $v);
+                $formatted .= "<b>$k</b>: ".str_replace('_', '\_', $v);
             }
         }
 
         $params = [
             'chat_id' => $chatId,
             'text' => $formatted,
-            'parse_mode' => 'Markdown',
+            'parse_mode' => 'HTML',
         ];
 
         return $this->send($params);
     }
 
-    public function sendEvent($app, $chat, $event, $data)
+    public function sendEvent($app, $chat, $event)
     {
         $appName = $app->name;
-        // $text = "*$appName*".PHP_EOL;
-        $text = "*$event*".PHP_EOL.PHP_EOL;
-        if ($data) {
-            $text .= '*Data*: '.PHP_EOL;
-            // foreach ($data as $k => $v) {
-            //     $text .= "$k: $v".PHP_EOL;
-            // }
-            $text .= $this->formatEvent('', $data);
+        $text = '';
+        if(str_replace('rt_', '', $event->type) == 'error') $text .= '❌ ';
+        if(str_replace('rt_', '', $event->type) == 'event') $text .= '❕ ';
+        $name = $event->event;
+        $text .= "<b>$name</b>".PHP_EOL.PHP_EOL;
+        if ($event->data) {
+            $text .= '<b>Data</b>: '.PHP_EOL;
+            $text .= $this->formatEvent('', $event->data);
         }
 
         return $this->sendText($chat->identifier, $text);
@@ -80,6 +80,7 @@ class Telegram implements Network
     private function send($params)
     {
         $token = $this->token;
+        $params['disable_web_page_preview'] = true;
         $response = $this->client->post("https://api.telegram.org/bot$token/sendMessage", ['json' => $params]);
         $result = json_decode((string) $response->getBody()->getContents(), true);
         if (!$result['ok']) {
@@ -90,15 +91,9 @@ class Telegram implements Network
     }
 
     private function formatEvent($text, $data, $prefix = '') {
-        \Log::debug($data);
-        \Log::debug('sub');
         foreach ($data as $k => $v) {
-            \Log::debug('-----');
-            \Log::debug($k);
-            \Log::debug($v);
-            \Log::debug($text);
             if(gettype($v) === 'array') {
-                $text .= $this->formatEvent($text, $v, $k.'.');
+                $text = $this->formatEvent($text, $v, $prefix.$k.' ➤ ');
             } else {
                 $text .= "$prefix$k: $v".PHP_EOL;
             }

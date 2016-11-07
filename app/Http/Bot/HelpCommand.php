@@ -2,11 +2,24 @@
 
 namespace App\Http\Bot;
 use App\Networks\NetworkFactory;
+use App\Chat;
+use App\Http\Bot\CommandFactory;
 
-class <Command> extends Command
+class HelpCommand extends Command
 {
+
     public function execute($network, $chatId, $cmd, $params = '') {
         $handler = NetworkFactory::create($network);
+        $chat = Chat::findByNetworkAndIdentifier($network, $chatId);
+
+        $text = 'Hey '.$chat->name.'!'.PHP_EOL.PHP_EOL;
+        $text .= 'Here\'s a list of available commands:'.PHP_EOL;
+        $commands = CommandFactory::$commands;
+        foreach($commands as $k=>$v) {
+            if($k != '/help') $text .= $k.PHP_EOL;
+        }
+
+        $handler->sendText($chatId, $text);
     }
 
     public function help($network, $chatId) {

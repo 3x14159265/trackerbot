@@ -8,7 +8,7 @@ interface Network {
 
     function getInfo($chatId);
 
-    function sendEvent($app, $chat, $event, $data);
+    function sendEvent($app, $chat, $event);
 
     function sendText($chatId, $text);
 

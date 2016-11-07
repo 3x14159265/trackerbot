@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Http\Requests;
 use App\Http\Bot\CommandFactory;
 use App\Chat;
@@ -11,22 +10,37 @@ use App\App;
 
 class TelegramController extends Controller
 {
-    public function webhook(Request $request) {
-        $data = $request->all();
+    public function webhook(Request $request)
+    {
+        try {
+            $data = $request->all();
 
-        if(array_key_exists('message', $data)
+            if (array_key_exists('message', $data)
             && array_key_exists('text', $data['message'])) {
                 $text = $data['message']['text'];
-                if(starts_with($text, '/')) $text = str_replace('@'.getenv('TELEGRAM_BOT'), '', $text);
+                if (starts_with($text, '/')) {
+                    $text = str_replace('@'.getenv('TELEGRAM_BOT'), '', $text);
+                }
                 $params = explode(' ', $text, 2);
-                if(count($params) == 1) $params[1] = '';
+                if (count($params) == 1) {
+                    $params[1] = '';
+                }
                 $command = CommandFactory::get($params[0]);
-                $result = $command->execute('telegram', $data['message']['chat']['id'], $params[0], $params[1]);
+                if (trim($params[1]) === 'help') {
+                    $command->help('telegram', $data['message']['chat']['id']);
+                } else {
+                    $command->execute('telegram', $data['message']['chat']['id'], $params[0], $params[1]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error($e);
         }
+
         return response()->json('');
     }
 
-    public function connect(Requests\TelegramConnectRequest $request) {
+    public function connect(Requests\TelegramConnectRequest $request)
+    {
         $user = $request->user();
         $appId = $request->input('app_id');
         $app = App::findOrFail($appId);
@@ -36,17 +50,17 @@ class TelegramController extends Controller
         $telegramChat = json_decode(file_get_contents("https://api.telegram.org/bot$token/getChat?chat_id=$chatId"), true)['result'];
 
         $name = '';
-        if(array_key_exists('title', $telegramChat)) {
+        if (array_key_exists('title', $telegramChat)) {
             $name = $telegramChat['title'];
-        } else if(array_key_exists('username', $telegramChat)) {
+        } elseif (array_key_exists('username', $telegramChat)) {
             $name = $telegramChat['username'];
-        } else if(array_key_exists('last_name', $telegramChat)) {
+        } elseif (array_key_exists('last_name', $telegramChat)) {
             $name = $telegramChat['last_name'];
-        } else if(array_key_exists('first_name', $telegramChat)) {
+        } elseif (array_key_exists('first_name', $telegramChat)) {
             $name = $telegramChat['first_name'];
         }
 
-        if(Chat::existsByNameAndIdentifierAndApp($name, $chatId, $app)) {
+        if (Chat::existsByNameAndIdentifierAndApp($name, $chatId, $app)) {
             return response()->json([]);
         }
 
@@ -60,6 +74,4 @@ class TelegramController extends Controller
 
         return response()->json([$chat]);
     }
-
-
 }

@@ -15,7 +15,7 @@ class Slack implements Network {
         return 'sl_';
     }
 
-    public function send($app, $chat, $event, $data) {
+    public function send($app, $chat, $event) {
         $text = '🌐 *App*: '.$app->name.PHP_EOL;
         $text .= '📌 *Event*: '.$event;
         if($data) {

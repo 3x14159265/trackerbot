@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAppsTable extends Migration
+class CreateAlertsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,14 +12,16 @@ class CreateAppsTable extends Migration
      */
     public function up()
     {
-        Schema::create('apps', function (Blueprint $table) {
+        Schema::create('alerts', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('network');
+            $table->integer('app_id')->unsigned();
             $table->string('name');
-            $table->string('api_key');
-            $table->string('api_secret');
-            $table->text('urls');
+            $table->timestamp('fire_at');
             $table->timestamps();
+
+            $table->foreign('app_id')
+               ->references('id')->on('apps')
+               ->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -30,6 +32,6 @@ class CreateAppsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('apps');
+        Schema::drop('alerts');
     }
 }

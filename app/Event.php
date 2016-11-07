@@ -30,7 +30,7 @@ class Event extends Model
             $chats = Chat::findByApp($app);
             foreach($chats as $chat) {
                 $network = NetworkFactory::create($app->network);
-                $network->sendEvent($app, $chat, $event->event, $event->data);
+                $network->sendEvent($app, $chat, $event);
             }
         }
 
