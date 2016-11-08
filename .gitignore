@@ -4,6 +4,7 @@
 Homestead.yaml
 Homestead.json
 .env
+.env.production
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
