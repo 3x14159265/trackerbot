@@ -48,11 +48,14 @@ class WatcherCommand extends Command
         } elseif (count($params) == 2 && $params[1] == 'delete') {
             try {
                 $chat = Chat::findByNetworkAndIdentifier($network, $chatId);
-                Watcher::findByAppIdAndUrl($chat->app_id, $params[0])->delete();
+                $w = $params[0];
+                Watcher::findByAppIdAndUrl($chat->app_id, $w)->delete();
+                return $handler->sendText($chatId, "👌 I have deleted this watcher for you: $w");
             } catch (\Exception $e) {
+                return $handler->sendText($chatId, "🤔 Hmm, I didn't find this watcher...");
             }
 
-            return $handler->sendText($chatId, 'Watcher deleted.');
+
         } else {
             $status = $this->getStatus($params[0]);
 
@@ -64,7 +67,14 @@ class WatcherCommand extends Command
             $watcher->status = $status[1];
             $watcher->save();
 
-            return $handler->sendText($chatId, 'Watcher saved.');
+            $current = $watcher->status >= 400 || $watcher->status == 0 ? 'offline' : 'online';
+            $httpStatus = $watcher->status;
+
+            $w = $watcher->url;
+            $text ="👍 I have added this watcher for you: $w. ".PHP_EOL;
+            $text .= "The current status is <b>$current</b> (HTTP Code $httpStatus). ";
+            $text .= "I'll inform you with any upcoming status changes.";
+            return $handler->sendText($chatId, $text);
         }
     }
 
@@ -86,11 +96,11 @@ class WatcherCommand extends Command
     {
         $watchers = Watcher::all();
         foreach ($watchers as $watcher) {
-            $last = $watcher->status >= 400 ? 'offline' : 'online';
+            $last = $watcher->status >= 400 || $watcher->status == 0 ? 'offline' : 'online';
             $status = $this->getStatus($watcher->url);
             $watcher->status = $status[1];
             $watcher->save();
-            $current = $status[1] >= 400 ? 'offline' : 'online';
+            $current = $status[1] >= 400 || $watcher->status == 0 ? 'offline' : 'online';
             if ($last != $current) {
                 $url = $watcher->url;
                 $emoji = $current == 'online' ?  '✅' : '❌';

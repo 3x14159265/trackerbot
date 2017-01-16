@@ -14,7 +14,7 @@ class Builtwith {
         $this->endpoint = "https://api.builtwith.com/v11/api.json?KEY=$key&LOOKUP=";
     }
 
-    public function sendInfo($app, $url, $filter = []) {
+    public function sendInfo($app, $url, $filter = [], $meta = []) {
         $filter = array_map(function($v) {
             return strtolower($v);
         }, $filter);
@@ -44,7 +44,7 @@ class Builtwith {
             $chats = Chat::findByApp($app);
             foreach($chats as $chat) {
                 $network = NetworkFactory::create($app->network);
-                $network->sendText($chat->identifier, $text);
+                $network->sendText($chat->identifier, $text, $meta);
             }
         }
     }

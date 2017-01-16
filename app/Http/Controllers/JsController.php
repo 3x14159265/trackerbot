@@ -51,8 +51,9 @@ class JsController extends Controller
     {
         $app = App::findByKey($request->header('X-Api-Key'));
         $data = $request->input('data');
+        $meta = array_key_exists('meta', $data) ? $data['meta'] : [];
         $builtwith = new Builtwith();
-        $builtwith->sendInfo($app, $data['domain'], $data['filter']);
+        $builtwith->sendInfo($app, $data['domain'], $data['filter'], $meta);
 
         $response = response()->json(['status' => 'event_created'], 201);
         foreach ($app->urls as $url) {

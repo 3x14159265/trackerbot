@@ -27,7 +27,7 @@ Route::get('/', function () {
 
 Route::post('/api/track', 'ApiController@track');
 Route::post('/api/domain', 'ApiController@domain');
-Route::post('/api/email/', 'ApiController@email');
+Route::post('/api/email', 'ApiController@email');
 Route::post('/js/track/{api_key}', 'JsController@track');
 Route::post('/js/domain/{api_key}', 'JsController@domain');
 Route::post('/js/email/{api_key}', 'JsController@email');

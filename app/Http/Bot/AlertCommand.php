@@ -38,10 +38,11 @@ class AlertCommand extends Command
                 $id = trim($params[0]);
                 $alert = Alert::findByIdAndAppId($id, $chat->app_id);
                 if ($alert) {
+                    $text = $alert->name;
                     $alert->delete();
-                    return $handler->sendText($chatId, 'Alert deleted.');
+                    return $handler->sendText($chatId, "👌 I have deleted this alert for you: $text");
                 } else {
-                    return $handler->sendText($chatId, 'Alert not found.');
+                    return $handler->sendText($chatId, "😯 Sorry, but I couldn't find an alert with this id...");
                 }
             } else {
                 if (strpos($params, '-') !== false) {
@@ -66,8 +67,10 @@ class AlertCommand extends Command
                 $alert->fire_at = $time;
                 $alert->save();
 
-                $text = 'Alert scheduled.'.PHP_EOL;
-                $text .= '<b>ID</b>: '.$alert->id.', <b>Alert</b>: '.$alert->name.' in '.$this->getDiff($alert).PHP_EOL;
+                $text = '☝ Great. I\'ll remind you in '.$this->getDiff($alert).' about '.$alert->name;
+                $text .= '. Your id is '.$alert->id.PHP_EOL;
+                $text .= 'If you want me to remove this alert, just send \'/alert '.$alert->id.' delete\'';
+                // $text .= '<b>ID</b>: '.$alert->id.', <b>Alert</b>: '.$alert->name.' in '.$this->getDiff($alert).PHP_EOL;
 
                 return $handler->sendText($chatId, $text);
             }

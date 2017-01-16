@@ -14,7 +14,16 @@ use App\APIProviders\Builtwith;
 
 class ApiController extends Controller
 {
-
+    /**
+     * Tracks an event
+     * Input: [
+     * 		'data' => [
+     * 			'type' => 'event|rt_event|error|rt_error',
+     * 			'event' => 'Name of the event',
+     * 			'data' => [<generic array>]
+     * 		]
+     * ]
+     */
     public function track(ApiRequest $request) {
         $app = App::findByKeyAndSecret($request->header('X-Api-Key'), $request->header('X-Api-Secret'));
         $data = $request->input('data');
@@ -23,11 +32,21 @@ class ApiController extends Controller
         return response()->json(['status' => 'event_created'], 201);
     }
 
+    /**
+     * Tracks an event
+     * Input: [
+     * 		'data' => [
+     * 			'domain' => 'a valid domain without https?://',
+     * 			'filter' => [<optional (but recommended) array of elements to filter technology>]
+     * 		]
+     * ]
+     */
     public function domain(ApiRequest $request) {
         $app = App::findByKeyAndSecret($request->header('X-Api-Key'), $request->header('X-Api-Secret'));
-        $data = $request->input('data');
+        $payload = $request->input('data');
+        $meta = array_key_exists('meta', $payload) ? $payload['meta'] : [];
         $builtwith = new Builtwith();
-        $builtwith->sendInfo($app, $data['domain'], $data['filter']);
+        $builtwith->sendInfo($app, $payload['domain'], $payload['filter'], $meta);
 
         return response()->json(['status' => 'event_created'], 201);
     }

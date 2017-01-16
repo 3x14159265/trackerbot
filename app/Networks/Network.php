@@ -10,6 +10,6 @@ interface Network {
 
     function sendEvent($app, $chat, $event);
 
-    function sendText($chatId, $text);
+    function sendText($chatId, $text, $meta = []);
 
 }
