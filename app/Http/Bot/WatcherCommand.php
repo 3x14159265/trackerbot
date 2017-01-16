@@ -83,7 +83,11 @@ class WatcherCommand extends Command
         $chat = Chat::findByNetworkAndIdentifier($network, $chatId);
 
         $text = 'Hey '.$chat->name.'!'.PHP_EOL;
-        $text .= 'This command let you watch URLs and sends you a notifications if the status of the given urls changes.';
+        $text .= 'This command let you watch URLs and sends you a notifications if the status of the given urls changes.'.PHP_EOL.PHP_EOL;
+        $text .= 'To add a new watcher, pass the url to the watcher command, e.g.'.PHP_EOL;
+        $text .= '/watcher http://example.com'.PHP_EOL;
+        $text .= "To remove a watcher, add 'delete' to the command, e.g.".PHP_EOL;
+        $text .= '/watcher http://example.com delete';
 
         return $handler->sendText($chatId, $text);
     }

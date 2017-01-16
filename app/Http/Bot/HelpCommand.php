@@ -18,6 +18,7 @@ class HelpCommand extends Command
         foreach($commands as $k=>$v) {
             if($k != '/help') $text .= $k.PHP_EOL;
         }
+        $text .= PHP_EOL.'Help is available for each command, just type \'/command help\'';
 
         $handler->sendText($chatId, $text);
     }
