@@ -4,7 +4,7 @@
         dev = dev || false
         var self = this
         self.key = key
-        var url = 'https://api.trackerbot.com/js'
+        var url = 'https://messengersapi.com/js'
         if(dev) url = 'https://tracker.ngrok.io/js'
 
         self._domain = function (domain, filter) {
