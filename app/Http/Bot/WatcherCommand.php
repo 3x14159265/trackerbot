@@ -4,7 +4,6 @@ namespace App\Http\Bot;
 
 use App\Networks\NetworkFactory;
 use App\Chat;
-use App\App;
 use App\Watcher;
 
 class WatcherCommand extends Command
@@ -28,9 +27,9 @@ class WatcherCommand extends Command
             $chat = Chat::findByNetworkAndIdentifier($network, $chatId);
             $watchers = Watcher::findByAppId($chat->app_id);
             $text = '';
-            if(count($watchers)) {
+            if (count($watchers)) {
                 $text .= "Here's a list of your current active watchers:".PHP_EOL.PHP_EOL;
-                foreach($watchers as $w) {
+                foreach ($watchers as $w) {
                     $text .= $w->url.PHP_EOL;
                 }
                 $text .= PHP_EOL;
@@ -50,12 +49,11 @@ class WatcherCommand extends Command
                 $chat = Chat::findByNetworkAndIdentifier($network, $chatId);
                 $w = $params[0];
                 Watcher::findByAppIdAndUrl($chat->app_id, $w)->delete();
+
                 return $handler->sendText($chatId, "👌 I have deleted this watcher for you: $w");
             } catch (\Exception $e) {
                 return $handler->sendText($chatId, "🤔 Hmm, I didn't find this watcher...");
             }
-
-
         } else {
             $status = $this->getStatus($params[0]);
 
@@ -71,14 +69,16 @@ class WatcherCommand extends Command
             $httpStatus = $watcher->status;
 
             $w = $watcher->url;
-            $text ="👍 I have added this watcher for you: $w. ".PHP_EOL;
+            $text = "👍 I have added this watcher for you: $w. ".PHP_EOL;
             $text .= "The current status is <b>$current</b> (HTTP Code $httpStatus). ";
             $text .= "I'll inform you with any upcoming status changes.";
+
             return $handler->sendText($chatId, $text);
         }
     }
 
-    public function help($network, $chatId) {
+    public function help($network, $chatId)
+    {
         $handler = NetworkFactory::create($network);
         $chat = Chat::findByNetworkAndIdentifier($network, $chatId);
 
@@ -99,9 +99,17 @@ class WatcherCommand extends Command
     public function schedule()
     {
         $watchers = Watcher::all();
+        \Log::debug($watchers);
         foreach ($watchers as $watcher) {
             $last = $watcher->status >= 400 || $watcher->status == 0 ? 'offline' : 'online';
             $status = $this->getStatus($watcher->url);
+            \Log::debug($status);
+            // double check if offline
+            $status = $status[1] >= 400 ? $this->getStatus($watcher->url) : $status;
+            \Log::debug($status);
+            // triple check if offline
+            $status = $status[1] >= 400 ? $this->getStatus($watcher->url) : $status;
+            \Log::debug($status);
             $watcher->status = $status[1];
             $watcher->save();
             $current = $status[1] >= 400 || $watcher->status == 0 ? 'offline' : 'online';
@@ -110,10 +118,10 @@ class WatcherCommand extends Command
                 $emoji = $current == 'online' ?  '✅' : '❌';
                 $text = "$emoji Your site $url is $current!";
                 $data = [
-                    'Alert' => $text,
-                    'HTTP Code' => $status[1],
-                    'HTTP Status' => $status[2]
-                ];
+                        'Alert' => $text,
+                        'HTTP Code' => $status[1],
+                        'HTTP Status' => $status[2],
+                    ];
                 $this->sendToChats($watcher->app_id, $data);
             }
         }
